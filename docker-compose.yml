@@ -13,7 +13,7 @@ services:
       - POSTGRES_DB=${DB_NAME}
 
   backend:
-    image: jaderodev/aup-chatbot:latest
+    build: .
     environment:
       DATABASE_URL: ${DATABASE_URL}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
