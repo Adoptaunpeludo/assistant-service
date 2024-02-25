@@ -10,7 +10,7 @@ import { Document } from 'langchain/document';
 import { prisma } from '../../data/prisma';
 import { Prisma } from '@prisma/client';
 
-export class ChatService {
+export class ChatbotService {
   private readonly model: ChatOpenAI;
   private readonly passThrough = new RunnablePassthrough();
   private readonly stringParser = new StringOutputParser();

@@ -12,5 +12,5 @@ async function main() {
     routes: AppRoutes.routes,
   });
 
-  await server.start();
+  server.start();
 }
