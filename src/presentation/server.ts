@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+import cors from 'cors';
 
 interface Options {
   port: number;
@@ -21,6 +22,11 @@ export class Server {
   async start() {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(
+      cors({
+        origin: '*',
+      })
+    );
 
     this.app.use(this.routes);
 
