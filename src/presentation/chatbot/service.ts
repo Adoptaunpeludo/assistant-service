@@ -15,6 +15,7 @@ export class ChatbotService {
   private readonly passThrough = new RunnablePassthrough();
   private readonly stringParser = new StringOutputParser();
   private readonly embeddings = new OpenAIEmbeddings();
+  private readonly convHistory: string[] = [];
 
   constructor(
     private readonly openAIApiKey: string,
@@ -29,7 +30,8 @@ export class ChatbotService {
   }
 
   private generateStandAloneQuestionChain() {
-    const standAloneQuestionTemplate = `Given a question, convert it to a standalone question.
+    const standAloneQuestionTemplate = `Given some conversation history (if any) and a question, convert the question to a standalone question.
+    conversation history: {conv_history}
     question: {question}
     standalone question:`;
 
@@ -59,7 +61,7 @@ export class ChatbotService {
     const retriever = vectorStore.asRetriever();
 
     const retrieverChain = RunnableSequence.from([
-      (prevResult) => prevResult.standaloneQuestion,
+      (prevResult) => prevResult.standalone_question,
       retriever,
       this.combineDocuments,
     ]);
@@ -72,15 +74,28 @@ export class ChatbotService {
   }
 
   private generateAnswerChain() {
-    const answerTemplate = `You are a helpful and enthusiastic support bot who can answer a given question about Adoptaunpeludo based on the context provided. Try to find the answer in the context. If you really don't know the answer, say "I'm sorry, I don't know the answer to that." And direct the questioner to email adoptaunpeludo@gmail.com. Don't try to make up an answer. Always speak as if you were chatting to a friend. Answer always in the same language as the user.
-      context: {context}
-      question: {question}
-      answer:`;
+    const answerTemplate = `You are a helpful and enthusiastic support bot who can answer a given question about adoptaunpeludo.com based on the context provided and the conversation history. Try to find the answer in the context. If the answer is not given in the context, find the answer in the conversation history if possible. If you really don't know the answer, say "Lo siento, no puedo responderte a eso." And direct the questioner to email adoptaunpeludoapp@gmail.com. Don't try to make up an answer. Always speak as if you were chatting to a friend.
+    context: {context}
+    conversation history: {conv_history}
+    question: {question}
+    answer: `;
 
     const answerPrompt = PromptTemplate.fromTemplate(answerTemplate);
     const answerChain = answerPrompt.pipe(this.model).pipe(this.stringParser);
 
     return answerChain;
+  }
+
+  private formatConvHistory(messages: string[]) {
+    return messages
+      .map((message, i) => {
+        if (i % 2 === 0) {
+          return `Human: ${message}`;
+        } else {
+          return `AI: ${message}`;
+        }
+      })
+      .join('\n');
   }
 
   public async getChatBotAnswer(question: string) {
@@ -90,19 +105,27 @@ export class ChatbotService {
 
     const chain = RunnableSequence.from([
       {
-        standaloneQuestion: standAloneQuestionChain,
-        originalQuestion: this.passThrough,
+        standalone_question: standAloneQuestionChain,
+        originalInput: this.passThrough,
       },
       {
         context: retrieverChain,
-        question: ({ originalQuestion }) => originalQuestion.question,
+        question: ({ originalInput }) => originalInput.question,
+        conv_history: ({ originalInput }) => {
+          console.log({ history: originalInput.conv_history });
+          return originalInput.conv_history;
+        },
       },
       answerChain,
     ]);
 
     const response = await chain.invoke({
       question,
+      conv_history: this.formatConvHistory(this.convHistory),
     });
+
+    this.convHistory.push(question);
+    this.convHistory.push(response);
 
     return response;
   }
