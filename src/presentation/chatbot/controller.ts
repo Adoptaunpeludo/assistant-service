@@ -21,6 +21,7 @@ export class ChatbotController {
     let answer = '';
     for await (const chunk of response) {
       answer += chunk;
+      console.log({ chunk });
       res.write(chunk);
     }
     this.convHistory.push(answer);
