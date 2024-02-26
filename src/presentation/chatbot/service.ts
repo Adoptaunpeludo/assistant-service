@@ -98,7 +98,7 @@ export class ChatbotService {
       .join('\n');
   }
 
-  public async getChatBotAnswer(question: string) {
+  public async getChatBotAnswer(question: string, convHistory: string[]) {
     const standAloneQuestionChain = this.generateStandAloneQuestionChain();
     const retrieverChain = this.generateRetrieverChain();
     const answerChain = this.generateAnswerChain();
@@ -119,14 +119,13 @@ export class ChatbotService {
       answerChain,
     ]);
 
-    const response = await chain.invoke({
+    const stream = await chain.stream({
       question,
-      conv_history: this.formatConvHistory(this.convHistory),
+      conv_history: this.formatConvHistory(convHistory),
     });
 
-    this.convHistory.push(question);
-    this.convHistory.push(response);
+    convHistory.push(question);
 
-    return response;
+    return stream;
   }
 }
