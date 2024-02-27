@@ -15,7 +15,6 @@ export class ChatbotService {
   private readonly passThrough = new RunnablePassthrough();
   private readonly stringParser = new StringOutputParser();
   private readonly embeddings = new OpenAIEmbeddings();
-  private readonly convHistory: string[] = [];
 
   constructor(
     private readonly openAIApiKey: string,
