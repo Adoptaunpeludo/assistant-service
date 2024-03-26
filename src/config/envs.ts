@@ -10,4 +10,5 @@ export const envs = {
   DB_PASSWORD: get('DB_PASSWORD').required().asString(),
   DB_USER: get('DB_USER').required().asString(),
   DB_NAME: get('DB_NAME').required().asString(),
+  MONGO_DB_URL: get('MONGO_DB_URL').required().asString(),
 };
