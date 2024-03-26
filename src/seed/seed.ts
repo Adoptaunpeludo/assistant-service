@@ -1,10 +1,10 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import { PrismaVectorStore } from '@langchain/community/vectorstores/prisma';
-import { Documents, Prisma } from '@prisma/client';
 import { OpenAIEmbeddings } from '@langchain/openai';
+import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { prisma } from '../data/prisma';
+import { createClient } from '@supabase/supabase-js';
+import { envs } from '../config/envs';
 
 (async () => {
   await seed();
@@ -12,13 +12,15 @@ import { prisma } from '../data/prisma';
 
 async function seed() {
   try {
+    const client = createClient(envs.SUPABASE_URL, envs.SUPABASE_PRIVATE_KEY);
+
     //* Read File and Split
     const filePath = path.resolve(__dirname, 'adoptaunpeludo.txt');
     const text = await fs.readFile(filePath, 'utf-8');
 
     const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 500,
-      chunkOverlap: 50,
+      chunkSize: 250,
+      chunkOverlap: 30,
     });
 
     const output = await splitter.createDocuments([text]);
@@ -26,31 +28,14 @@ async function seed() {
     console.log({ output });
 
     //* Store output in a prisma vector store
-    const vectorStore = PrismaVectorStore.withModel<Documents>(prisma).create(
-      new OpenAIEmbeddings({
-        openAIApiKey: process.env.OPENAI_API_KEY,
-      }),
+    const vectorStore = await SupabaseVectorStore.fromDocuments(
+      output,
+      new OpenAIEmbeddings(),
       {
-        prisma: Prisma,
-        tableName: 'Documents',
-        vectorColumnName: 'vector',
-        columns: {
-          id: PrismaVectorStore.IdColumn,
-          content: PrismaVectorStore.ContentColumn,
-        },
+        client,
+        tableName: 'documents',
+        queryName: 'match_documents',
       }
-    );
-
-    await vectorStore.addModels(
-      await prisma.$transaction(
-        output.map((chunk) =>
-          prisma.documents.create({
-            data: {
-              content: chunk.pageContent,
-            },
-          })
-        )
-      )
     );
   } catch (err) {
     console.log(err);

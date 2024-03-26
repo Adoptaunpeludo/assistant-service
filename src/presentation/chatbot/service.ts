@@ -3,128 +3,107 @@ import {
   RunnablePassthrough,
   RunnableSequence,
 } from '@langchain/core/runnables';
-import { PromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
-import { PrismaVectorStore } from '@langchain/community/vectorstores/prisma';
-import { Document } from 'langchain/document';
-import { prisma } from '../../data/prisma';
-import { Prisma } from '@prisma/client';
+import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { createRetrieverTool } from 'langchain/tools/retriever';
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+  // PromptTemplate,
+} from '@langchain/core/prompts';
+import { BufferMemory } from 'langchain/memory';
+import { createOpenAIFunctionsAgent, AgentExecutor } from 'langchain/agents';
 
 export class ChatbotService {
   private readonly model: ChatOpenAI;
   private readonly passThrough = new RunnablePassthrough();
   private readonly stringParser = new StringOutputParser();
   private readonly embeddings = new OpenAIEmbeddings();
+  private readonly client: SupabaseClient;
 
   constructor(
     private readonly openAIApiKey: string,
     private readonly temperature: number,
-    private readonly maxTokens: number
+    private readonly maxTokens: number,
+    private readonly supabaseUrl: string,
+    private readonly supabaseKey: string
   ) {
     this.model = new ChatOpenAI({
       openAIApiKey: this.openAIApiKey,
       temperature: this.temperature,
       maxTokens: this.maxTokens,
     });
+
+    this.client = createClient(this.supabaseUrl, this.supabaseKey);
   }
 
-  private generateStandAloneQuestionChain() {
-    const standAloneQuestionTemplate = `Given some conversation history (if any) and a question, convert the question to a standalone question.
-    conversation history: {conv_history}
-    question: {question}
-    standalone question:`;
+  private createPrompt(document: string) {
+    const prompt = ChatPromptTemplate.fromMessages([
+      [
+        'system',
+        `You are an intelligent AI assistant designed to interpret and answer questions and instructions based on specific provided document: ${document}. The context from these documents has been processed and made accessible to you. 
+        Your mission is to generate answers that are accurate, succinct, and comprehensive, drawing upon the information contained in the context of the documents. If the answer isn't readily found in the documents, you should make use of your training data and understood context to infer and provide the most plausible response.
+        You are also capable of evaluating, comparing and providing opinions based on the content of these documents. Hence, if asked to compare or analyze the documents, use your AI understanding to deliver an insightful response.
+        If the query isn't related to the document context, kindly inform the user that your primary task is to answer questions specifically related to the document context.
+        Always answer in the language you were initially asked.
+        Provide your response in markdown format.`,
+      ],
+      new MessagesPlaceholder('chat_history'),
+      ['human', '{input}'],
+      new MessagesPlaceholder('agent_scratchpad'),
+    ]);
 
-    const standAloneQuestionPrompt = PromptTemplate.fromTemplate(
-      standAloneQuestionTemplate
+    return prompt;
+  }
+
+  private async createRetrieverTool() {
+    const vectorStore = await SupabaseVectorStore.fromExistingIndex(
+      this.embeddings,
+      {
+        client: this.client,
+        tableName: 'documents',
+        queryName: 'match_documents',
+      }
     );
-
-    const standAloneQuestionChain = standAloneQuestionPrompt
-      .pipe(this.model)
-      .pipe(this.stringParser);
-
-    return standAloneQuestionChain;
-  }
-
-  private generateRetrieverChain() {
-    const vectorStore = new PrismaVectorStore(this.embeddings, {
-      db: prisma,
-      prisma: Prisma,
-      tableName: 'Documents',
-      vectorColumnName: 'vector',
-      columns: {
-        id: PrismaVectorStore.IdColumn,
-        content: PrismaVectorStore.ContentColumn,
-      },
-    });
 
     const retriever = vectorStore.asRetriever();
 
-    const retrieverChain = RunnableSequence.from([
-      (prevResult) => prevResult.standalone_question,
-      retriever,
-      this.combineDocuments,
-    ]);
+    const retrieverTool = createRetrieverTool(retriever, {
+      name: 'Adoptaunpeludo Assistant',
+      description: 'Toot to ask about the adoptaunpeludo.com webpage',
+    });
 
-    return retrieverChain;
+    return retrieverTool;
   }
 
-  private combineDocuments(docs: Document[]) {
-    return docs.map((doc) => doc.pageContent).join('\n\n');
-  }
+  private async createAgentExecutor(
+    tools: any,
+    prompt: ChatPromptTemplate
+    // memory: BufferMemory,
+  ) {
+    const agent = await createOpenAIFunctionsAgent({
+      llm: this.model,
+      tools,
+      prompt,
+    });
 
-  private generateAnswerChain() {
-    const answerTemplate = `You are a helpful and enthusiastic support bot who can answer a given question about adoptaunpeludo.com based on the context provided and the conversation history. Try to find the answer in the context. If the answer is not given in the context, find the answer in the conversation history if possible. If you really don't know the answer, say "Lo siento, no puedo responderte a eso." And direct the questioner to email adoptaunpeludoapp@gmail.com. Don't try to make up an answer. Always speak as if you were chatting to a friend.
-    context: {context}
-    conversation history: {conv_history}
-    question: {question}
-    answer: `;
+    const agentExecutor = new AgentExecutor({
+      agent,
+      tools,
+      // memory,
+    });
 
-    const answerPrompt = PromptTemplate.fromTemplate(answerTemplate);
-    const answerChain = answerPrompt.pipe(this.model).pipe(this.stringParser);
-
-    return answerChain;
-  }
-
-  private formatConvHistory(messages: string[]) {
-    return messages
-      .map((message, i) => {
-        if (i % 2 === 0) {
-          return `Human: ${message}`;
-        } else {
-          return `AI: ${message}`;
-        }
-      })
-      .join('\n');
+    return agentExecutor;
   }
 
   public async getChatBotAnswer(question: string, convHistory: string[]) {
-    const standAloneQuestionChain = this.generateStandAloneQuestionChain();
-    const retrieverChain = this.generateRetrieverChain();
-    const answerChain = this.generateAnswerChain();
+    const prompt = this.createPrompt('adoptaunpeludo.com');
 
-    const chain = RunnableSequence.from([
-      {
-        standalone_question: standAloneQuestionChain,
-        originalInput: this.passThrough,
-      },
-      {
-        context: retrieverChain,
-        question: ({ originalInput }) => originalInput.question,
-        conv_history: ({ originalInput }) => {
-          console.log({ history: originalInput.conv_history });
-          return originalInput.conv_history;
-        },
-      },
-      answerChain,
-    ]);
+    const retrieverTool = await this.createRetrieverTool();
 
-    const stream = await chain.stream({
-      question,
-      conv_history: this.formatConvHistory(convHistory),
-    });
+    const tools = [retrieverTool];
 
-    convHistory.push(question);
-
-    return stream;
+    const agentExecutor = await this.createAgentExecutor(tools, prompt);
   }
 }

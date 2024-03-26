@@ -9,7 +9,7 @@
     "build": "rimraf ./dist && tsc",
     "start": "node dist/app.js",
     "start:prod": "npx prisma migrate deploy && npm run start",
-    "seed": "node dist/seed/seed.js"
+    "seed": "tsnd --respawn --clear src/seed/seed.ts"
   },
   "author": "J.Alberto",
   "license": "ISC",
@@ -25,7 +25,7 @@
   "dependencies": {
     "@langchain/community": "^0.0.32",
     "@langchain/openai": "^0.0.14",
-    "@prisma/client": "^5.10.2",
+    "@supabase/supabase-js": "^2.39.8",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "env-var": "^7.4.1",
@@ -33,7 +33,6 @@
     "express-async-errors": "^3.1.1",
     "http-status-codes": "^2.3.0",
     "langchain": "^0.1.21",
-    "multer": "^1.4.5-lts.1",
-    "prisma": "^5.10.2"
+    "multer": "^1.4.5-lts.1"
   }
 }

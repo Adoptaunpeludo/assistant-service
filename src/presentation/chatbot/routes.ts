@@ -6,7 +6,13 @@ import { envs } from '../../config/envs';
 export class ChatbotRoutes {
   static get routes() {
     const router = Router();
-    const chatbotService = new ChatbotService(envs.OPENAI_API_KEY, 0.7, 500);
+    const chatbotService = new ChatbotService(
+      envs.OPENAI_API_KEY,
+      0.7,
+      500,
+      envs.SUPABASE_URL,
+      envs.SUPABASE_PRIVATE_KEY
+    );
     const chatbotController = new ChatbotController(chatbotService);
 
     router.post('/user-question', chatbotController.userQuestion);
