@@ -9,6 +9,8 @@ import {
 import { BufferMemory } from 'langchain/memory';
 import { createOpenAIFunctionsAgent, AgentExecutor } from 'langchain/agents';
 import { MemoryService } from '../memory/service';
+import { BaseMessage } from '@langchain/core/messages';
+import { ChatHistoryEntity } from '../../domain/entities/chat-history.entity';
 
 interface OpenAIOptions {
   openAIApiKey: string;
@@ -25,6 +27,9 @@ export class ChatbotService {
   private readonly model: ChatOpenAI;
   private readonly embeddings = new OpenAIEmbeddings();
   private readonly client: SupabaseClient;
+  private agentExecutor?: AgentExecutor;
+  private memory?: BufferMemory;
+  private chat_history: BaseMessage[] = [];
 
   constructor(
     private readonly openAIOptions: OpenAIOptions,
@@ -43,7 +48,27 @@ export class ChatbotService {
     this.client = createClient(supabaseUrl, supabaseKey);
   }
 
-  async createChat(username: string) {}
+  async createChat(username: string) {
+    try {
+      const prompt = this.createPrompt('adoptaunpeludo.com');
+
+      const retrieverTool = await this.createRetrieverTool();
+
+      this.memory = await this.memoryService.createMemory(username);
+
+      const tools = [retrieverTool];
+
+      this.agentExecutor = await this.createAgentExecutor(tools, prompt);
+
+      this.chat_history = await this.memory.chatHistory.getMessages();
+
+      return ChatHistoryEntity.fromObject(this.chat_history);
+    } catch (error) {
+      console.log(error);
+
+      throw 'Error creating chat agent';
+    }
+  }
 
   private createPrompt(document: string) {
     const prompt = ChatPromptTemplate.fromMessages([
@@ -84,11 +109,7 @@ export class ChatbotService {
     return retrieverTool;
   }
 
-  private async createAgentExecutor(
-    tools: any,
-    prompt: ChatPromptTemplate,
-    memory: BufferMemory
-  ) {
+  private async createAgentExecutor(tools: any, prompt: ChatPromptTemplate) {
     const agent = await createOpenAIFunctionsAgent({
       llm: this.model,
       tools,
@@ -98,31 +119,17 @@ export class ChatbotService {
     const agentExecutor = new AgentExecutor({
       agent,
       tools,
-      memory,
+      memory: this.memory,
     });
 
     return agentExecutor;
   }
 
-  public async getChatBotAnswer(question: string, userId: string) {
-    const prompt = this.createPrompt('adoptaunpeludo.com');
-
-    const retrieverTool = await this.createRetrieverTool();
-
-    const memory = await this.memoryService.createMemory(userId);
-
-    const tools = [retrieverTool];
-
-    const agentExecutor = await this.createAgentExecutor(tools, prompt, memory);
-
-    const chat_history = await memory.chatHistory.getMessages();
-
-    console.log({ chat_history });
-
-    const response = await agentExecutor.invoke({
+  public async getChatBotAnswer(question: string) {
+    const response = await this.agentExecutor!.invoke({
       outputKey: 'output',
       input: question,
-      chat_history,
+      chat_history: this.chat_history,
     });
 
     return response.output;

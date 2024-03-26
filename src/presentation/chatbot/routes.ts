@@ -18,7 +18,7 @@ export class ChatbotRoutes {
     );
     const chatbotController = new ChatbotController(chatbotService);
 
-    router.post('/create-chat/:username');
+    router.post('/create-chat/:username', chatbotController.createChat);
     router.post('/user-question', chatbotController.userQuestion);
 
     return router;

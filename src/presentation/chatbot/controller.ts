@@ -31,17 +31,23 @@ export class ChatbotController {
   createChat = async (req: Request, res: Response) => {
     const { username } = req.params;
 
-    await this.chatbotService.createChat(username);
+    try {
+      const history = await this.chatbotService.createChat(username);
+      res.status(200).json({ message: 'Chat created successfully', history });
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
   };
 
   userQuestion = async (req: Request, res: Response) => {
-    const { question, userId } = req.body;
+    const { question } = req.body;
 
-    const response = await this.chatbotService.getChatBotAnswer(
-      question,
-      userId
-    );
-
-    return this.returnStream(res, response);
+    try {
+      const response = await this.chatbotService.getChatBotAnswer(question);
+      return this.returnStream(res, response);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error });
+    }
   };
 }

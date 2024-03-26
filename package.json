@@ -28,6 +28,7 @@
     "@langchain/mongodb": "^0.0.1",
     "@langchain/openai": "^0.0.14",
     "@supabase/supabase-js": "^2.39.8",
+    "@types/morgan": "^1.9.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "env-var": "^7.4.1",
@@ -36,6 +37,7 @@
     "http-status-codes": "^2.3.0",
     "langchain": "^0.1.21",
     "mongodb": "^6.5.0",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1"
   }
 }

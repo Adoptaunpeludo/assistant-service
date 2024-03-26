@@ -21,7 +21,7 @@ export class MemoryService {
     return await this.connectToCollection();
   }
 
-  async createMemory(userId: string) {
+  async createMemory(username: string) {
     const collection = await this.getCollection();
 
     const memory = new BufferMemory({
@@ -31,7 +31,7 @@ export class MemoryService {
       outputKey: 'output',
       chatHistory: new MongoDBChatMessageHistory({
         collection,
-        sessionId: userId,
+        sessionId: username,
       }),
     });
 
