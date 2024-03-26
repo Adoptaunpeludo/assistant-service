@@ -1,42 +1,49 @@
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
-import {
-  RunnablePassthrough,
-  RunnableSequence,
-} from '@langchain/core/runnables';
-import { StringOutputParser } from '@langchain/core/output_parsers';
 import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { createRetrieverTool } from 'langchain/tools/retriever';
 import {
   ChatPromptTemplate,
   MessagesPlaceholder,
-  // PromptTemplate,
 } from '@langchain/core/prompts';
 import { BufferMemory } from 'langchain/memory';
 import { createOpenAIFunctionsAgent, AgentExecutor } from 'langchain/agents';
+import { MemoryService } from '../memory/service';
+
+interface OpenAIOptions {
+  openAIApiKey: string;
+  temperature: number;
+  maxTokens: number;
+}
+
+interface SupabaseOptions {
+  supabaseUrl: string;
+  supabaseKey: string;
+}
 
 export class ChatbotService {
   private readonly model: ChatOpenAI;
-  private readonly passThrough = new RunnablePassthrough();
-  private readonly stringParser = new StringOutputParser();
   private readonly embeddings = new OpenAIEmbeddings();
   private readonly client: SupabaseClient;
 
   constructor(
-    private readonly openAIApiKey: string,
-    private readonly temperature: number,
-    private readonly maxTokens: number,
-    private readonly supabaseUrl: string,
-    private readonly supabaseKey: string
+    private readonly openAIOptions: OpenAIOptions,
+    private readonly supabaseOptions: SupabaseOptions,
+    private readonly memoryService: MemoryService
   ) {
+    const { maxTokens, openAIApiKey, temperature } = this.openAIOptions;
+
     this.model = new ChatOpenAI({
-      openAIApiKey: this.openAIApiKey,
-      temperature: this.temperature,
-      maxTokens: this.maxTokens,
+      openAIApiKey: openAIApiKey,
+      temperature: temperature,
+      maxTokens: maxTokens,
     });
 
-    this.client = createClient(this.supabaseUrl, this.supabaseKey);
+    const { supabaseKey, supabaseUrl } = this.supabaseOptions;
+    this.client = createClient(supabaseUrl, supabaseKey);
   }
+
+  async createChat(username: string) {}
 
   private createPrompt(document: string) {
     const prompt = ChatPromptTemplate.fromMessages([
@@ -70,7 +77,7 @@ export class ChatbotService {
     const retriever = vectorStore.asRetriever();
 
     const retrieverTool = createRetrieverTool(retriever, {
-      name: 'Adoptaunpeludo Assistant',
+      name: 'Adoptaunpeludo_Assistant',
       description: 'Toot to ask about the adoptaunpeludo.com webpage',
     });
 
@@ -79,8 +86,8 @@ export class ChatbotService {
 
   private async createAgentExecutor(
     tools: any,
-    prompt: ChatPromptTemplate
-    // memory: BufferMemory,
+    prompt: ChatPromptTemplate,
+    memory: BufferMemory
   ) {
     const agent = await createOpenAIFunctionsAgent({
       llm: this.model,
@@ -91,19 +98,33 @@ export class ChatbotService {
     const agentExecutor = new AgentExecutor({
       agent,
       tools,
-      // memory,
+      memory,
     });
 
     return agentExecutor;
   }
 
-  public async getChatBotAnswer(question: string, convHistory: string[]) {
+  public async getChatBotAnswer(question: string, userId: string) {
     const prompt = this.createPrompt('adoptaunpeludo.com');
 
     const retrieverTool = await this.createRetrieverTool();
 
+    const memory = await this.memoryService.createMemory(userId);
+
     const tools = [retrieverTool];
 
-    const agentExecutor = await this.createAgentExecutor(tools, prompt);
+    const agentExecutor = await this.createAgentExecutor(tools, prompt, memory);
+
+    const chat_history = await memory.chatHistory.getMessages();
+
+    console.log({ chat_history });
+
+    const response = await agentExecutor.invoke({
+      outputKey: 'output',
+      input: question,
+      chat_history,
+    });
+
+    return response.output;
   }
 }

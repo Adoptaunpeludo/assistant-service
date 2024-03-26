@@ -9,6 +9,7 @@ export class MemoryService {
     try {
       const client: MongoClient = new MongoClient(this.mongoDBUrl);
       await client.connect();
+      console.log('Connected to collection');
       return client.db('memory').collection('history');
     } catch (error) {
       console.log(error);
@@ -24,6 +25,10 @@ export class MemoryService {
     const collection = await this.getCollection();
 
     const memory = new BufferMemory({
+      returnMessages: true,
+      memoryKey: 'chat_history',
+      inputKey: 'input',
+      outputKey: 'output',
       chatHistory: new MongoDBChatMessageHistory({
         collection,
         sessionId: userId,
