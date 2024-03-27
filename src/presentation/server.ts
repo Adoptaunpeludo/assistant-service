@@ -2,6 +2,7 @@ import 'express-async-errors';
 import express, { Router } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import { ErrorHandlerMiddleware } from './middlewares/error-handler.middleware';
 
 interface Options {
   port: number;
@@ -32,6 +33,9 @@ export class Server {
     );
 
     this.app.use(this.routes);
+
+    //* Error Handler Middleware
+    this.app.use(ErrorHandlerMiddleware.handle);
 
     this.serverListener = this.app.listen(this.port, async () => {
       try {
