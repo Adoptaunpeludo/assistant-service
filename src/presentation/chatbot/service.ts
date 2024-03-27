@@ -134,4 +134,8 @@ export class ChatbotService {
 
     return response.output;
   }
+
+  public async deleteChatHistory() {
+    await this.memory?.chatHistory.clear();
+  }
 }

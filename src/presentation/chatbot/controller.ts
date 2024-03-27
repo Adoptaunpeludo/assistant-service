@@ -50,4 +50,14 @@ export class ChatbotController {
       res.status(500).json({ message: error });
     }
   };
+
+  deleteChatHistory = async (_req: Request, res: Response) => {
+    try {
+      await this.chatbotService.deleteChatHistory();
+      res.status(200).json({ message: 'Chat history deleted successfully' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error });
+    }
+  };
 }
