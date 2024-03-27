@@ -1,5 +1,4 @@
-import { UserRoles } from './user-response.interface';
-
+export type UserRoles = 'admin' | 'adopter' | 'shelter';
 export interface PayloadUser {
   id?: string;
   name?: string;
