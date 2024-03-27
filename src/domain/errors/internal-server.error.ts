@@ -1,4 +1,4 @@
-import { HttpCodes } from '../../config';
+import { HttpCodes } from '../../config/http-status-codes.adapter';
 import { CustomAPIError } from './custom-api.error';
 
 /**
