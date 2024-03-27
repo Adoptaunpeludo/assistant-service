@@ -3,10 +3,12 @@ import { ChatbotService } from './service';
 import { ChatbotController } from './controller';
 import { envs } from '../../config/envs';
 import { MemoryService } from '../memory/service';
+import { JWTAdapter } from '../../config/jwt.adapter';
 
 export class ChatbotRoutes {
   static get routes() {
     const router = Router();
+    const jwt = new JWTAdapter(envs.JWT_SEED);
     const memoryService = new MemoryService(envs.MONGO_DB_URL);
     const chatbotService = new ChatbotService(
       { maxTokens: 500, openAIApiKey: envs.OPENAI_API_KEY, temperature: 0.7 },
@@ -14,7 +16,8 @@ export class ChatbotRoutes {
         supabaseKey: envs.SUPABASE_PRIVATE_KEY,
         supabaseUrl: envs.SUPABASE_URL,
       },
-      memoryService
+      memoryService,
+      jwt
     );
     const chatbotController = new ChatbotController(chatbotService);
 

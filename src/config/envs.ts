@@ -11,4 +11,6 @@ export const envs = {
   // DB_USER: get('DB_USER').required().asString(),
   // DB_NAME: get('DB_NAME').required().asString(),
   MONGO_DB_URL: get('MONGO_DB_URL').required().asString(),
+
+  JWT_SEED: get('JWT_SEED').required().asString(),
 };

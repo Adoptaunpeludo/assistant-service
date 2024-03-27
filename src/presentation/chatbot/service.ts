@@ -11,6 +11,7 @@ import { createOpenAIFunctionsAgent, AgentExecutor } from 'langchain/agents';
 import { MemoryService } from '../memory/service';
 import { BaseMessage } from '@langchain/core/messages';
 import { ChatHistoryEntity } from '../../domain/entities/chat-history.entity';
+import { JWTAdapter } from '../../config/jwt.adapter';
 
 interface OpenAIOptions {
   openAIApiKey: string;
@@ -34,7 +35,8 @@ export class ChatbotService {
   constructor(
     private readonly openAIOptions: OpenAIOptions,
     private readonly supabaseOptions: SupabaseOptions,
-    private readonly memoryService: MemoryService
+    private readonly memoryService: MemoryService,
+    private readonly jwt: JWTAdapter
   ) {
     const { maxTokens, openAIApiKey, temperature } = this.openAIOptions;
 
@@ -48,13 +50,21 @@ export class ChatbotService {
     this.client = createClient(supabaseUrl, supabaseKey);
   }
 
-  async createChat(username: string) {
+  async createChat(token: string) {
     try {
+      const payload = this.jwt.validateToken(token);
+
+      if (!payload) throw 'Wrong token validation';
+
+      const {
+        user: { name: username },
+      } = payload;
+
       const prompt = this.createPrompt('adoptaunpeludo.com');
 
       const retrieverTool = await this.createRetrieverTool();
 
-      this.memory = await this.memoryService.createMemory(username);
+      this.memory = await this.memoryService.createMemory(username!);
 
       const tools = [retrieverTool];
 
