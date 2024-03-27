@@ -8,7 +8,7 @@
     "dev": "tsnd --respawn --clear src/app.ts",
     "build": "rimraf ./dist && tsc",
     "start": "node dist/app.js",
-    "start:prod": "npx prisma migrate deploy && npm run start",
+    "start:prod": "npm run start",
     "seed": "tsnd --respawn --clear src/seed/seed.ts"
   },
   "author": "J.Alberto",
