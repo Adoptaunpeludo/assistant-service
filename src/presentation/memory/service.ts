@@ -1,6 +1,7 @@
 import { BufferMemory } from 'langchain/memory';
 import { Collection, MongoClient } from 'mongodb';
 import { MongoDBChatMessageHistory } from '@langchain/mongodb';
+import { InternalServerError, NotFoundError } from '../../domain/errors';
 
 export class MemoryService {
   constructor(private readonly mongoDBUrl: string) {}
@@ -13,7 +14,7 @@ export class MemoryService {
       return client.db('memory').collection('history');
     } catch (error) {
       console.log(error);
-      throw 'Error connecting to MongoDB';
+      throw new InternalServerError('Error connecting to memory collection');
     }
   }
 
@@ -24,27 +25,36 @@ export class MemoryService {
   async createMemory(username: string) {
     const collection = await this.getCollection();
 
-    const memory = new BufferMemory({
-      returnMessages: true,
-      memoryKey: 'chat_history',
-      inputKey: 'input',
-      outputKey: 'output',
-      chatHistory: new MongoDBChatMessageHistory({
-        collection,
-        sessionId: username,
-      }),
-    });
+    try {
+      const memory = new BufferMemory({
+        returnMessages: true,
+        memoryKey: 'chat_history',
+        inputKey: 'input',
+        outputKey: 'output',
+        chatHistory: new MongoDBChatMessageHistory({
+          collection,
+          sessionId: username,
+        }),
+      });
 
-    return memory;
+      return memory;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerError('Error creating memory');
+    }
   }
 
   async removeHistory(userId: string) {
     try {
       const memory = await this.createMemory(userId);
+
+      if (!memory)
+        throw new NotFoundError(`History for ${userId} does not exist`);
+
       await memory.chatHistory.clear();
     } catch (error) {
       console.log(error);
-      throw 'Could not remove chat history';
+      throw new InternalServerError(`Error deleting history for ${userId}`);
     }
   }
 }

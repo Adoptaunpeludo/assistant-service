@@ -31,35 +31,19 @@ export class ChatbotController {
   createChat = async (req: Request, res: Response) => {
     const { token } = req.params;
 
-    console.log(req.params);
-
-    try {
-      const history = await this.chatbotService.createChat(token);
-      res.status(200).json({ message: 'Chat created successfully', history });
-    } catch (error) {
-      res.status(500).json({ message: error });
-    }
+    const history = await this.chatbotService.createChat(token);
+    res.status(200).json({ message: 'Chat created successfully', history });
   };
 
   userQuestion = async (req: Request, res: Response) => {
     const { question } = req.body;
 
-    try {
-      const response = await this.chatbotService.getChatBotAnswer(question);
-      return this.returnStream(res, response);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: error });
-    }
+    const response = await this.chatbotService.getChatBotAnswer(question);
+    return this.returnStream(res, response);
   };
 
   deleteChatHistory = async (_req: Request, res: Response) => {
-    try {
-      await this.chatbotService.deleteChatHistory();
-      res.status(200).json({ message: 'Chat history deleted successfully' });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: error });
-    }
+    await this.chatbotService.deleteChatHistory();
+    res.status(200).json({ message: 'Chat history deleted successfully' });
   };
 }

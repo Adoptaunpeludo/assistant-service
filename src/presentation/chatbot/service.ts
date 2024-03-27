@@ -12,6 +12,11 @@ import { MemoryService } from '../memory/service';
 import { BaseMessage } from '@langchain/core/messages';
 import { ChatHistoryEntity } from '../../domain/entities/chat-history.entity';
 import { JWTAdapter } from '../../config/jwt.adapter';
+import {
+  BadRequestError,
+  InternalServerError,
+  UnauthenticatedError,
+} from '../../domain/errors';
 
 interface OpenAIOptions {
   openAIApiKey: string;
@@ -39,22 +44,36 @@ export class ChatbotService {
     private readonly jwt: JWTAdapter
   ) {
     const { maxTokens, openAIApiKey, temperature } = this.openAIOptions;
+    try {
+      this.model = new ChatOpenAI({
+        openAIApiKey: openAIApiKey,
+        temperature: temperature,
+        maxTokens: maxTokens,
+      });
 
-    this.model = new ChatOpenAI({
-      openAIApiKey: openAIApiKey,
-      temperature: temperature,
-      maxTokens: maxTokens,
-    });
+      if (!this.model)
+        throw new BadRequestError('Error creating model, wrong openAIAPiKey');
 
-    const { supabaseKey, supabaseUrl } = this.supabaseOptions;
-    this.client = createClient(supabaseUrl, supabaseKey);
+      const { supabaseKey, supabaseUrl } = this.supabaseOptions;
+      this.client = createClient(supabaseUrl, supabaseKey);
+
+      if (!this.client)
+        throw new BadRequestError(
+          'Error creating supabase client, wrong Url or Key'
+        );
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerError(
+        'Error creating model or supabase client, check logs'
+      );
+    }
   }
 
   async createChat(token: string) {
     try {
       const payload = this.jwt.validateToken(token);
 
-      if (!payload) throw 'Wrong token validation';
+      if (!payload) throw new UnauthenticatedError('Invalid JWT token');
 
       const {
         user: { name: username },
@@ -75,8 +94,7 @@ export class ChatbotService {
       return ChatHistoryEntity.fromObject(this.chat_history);
     } catch (error) {
       console.log(error);
-
-      throw 'Error creating chat agent';
+      throw new InternalServerError('Error creating chat, check logs');
     }
   }
 
@@ -100,52 +118,76 @@ export class ChatbotService {
   }
 
   private async createRetrieverTool() {
-    const vectorStore = await SupabaseVectorStore.fromExistingIndex(
-      this.embeddings,
-      {
-        client: this.client,
-        tableName: 'documents',
-        queryName: 'match_documents',
-      }
-    );
+    try {
+      const vectorStore = await SupabaseVectorStore.fromExistingIndex(
+        this.embeddings,
+        {
+          client: this.client,
+          tableName: 'documents',
+          queryName: 'match_documents',
+        }
+      );
 
-    const retriever = vectorStore.asRetriever();
+      const retriever = vectorStore.asRetriever();
 
-    const retrieverTool = createRetrieverTool(retriever, {
-      name: 'Adoptaunpeludo_Assistant',
-      description: 'Toot to ask about the adoptaunpeludo.com webpage',
-    });
+      const retrieverTool = createRetrieverTool(retriever, {
+        name: 'Adoptaunpeludo_Assistant',
+        description: 'Toot to ask about the adoptaunpeludo.com webpage',
+      });
 
-    return retrieverTool;
+      return retrieverTool;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerError(
+        'Error creating retriever tool, check logs'
+      );
+    }
   }
 
   private async createAgentExecutor(tools: any, prompt: ChatPromptTemplate) {
-    const agent = await createOpenAIFunctionsAgent({
-      llm: this.model,
-      tools,
-      prompt,
-    });
+    try {
+      const agent = await createOpenAIFunctionsAgent({
+        llm: this.model,
+        tools,
+        prompt,
+      });
 
-    const agentExecutor = new AgentExecutor({
-      agent,
-      tools,
-      memory: this.memory,
-    });
+      const agentExecutor = new AgentExecutor({
+        agent,
+        tools,
+        memory: this.memory,
+      });
 
-    return agentExecutor;
+      return agentExecutor;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerError(
+        'Error creating agent or agent executor, check logs'
+      );
+    }
   }
 
   public async getChatBotAnswer(question: string) {
-    const response = await this.agentExecutor!.invoke({
-      outputKey: 'output',
-      input: question,
-      chat_history: this.chat_history,
-    });
+    try {
+      const response = await this.agentExecutor!.invoke({
+        outputKey: 'output',
+        input: question,
+        chat_history: this.chat_history,
+      });
 
-    return response.output;
+      return response.output;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerError('Error getting agent answer, check logs');
+    }
   }
 
   public async deleteChatHistory() {
-    await this.memory?.chatHistory.clear();
+    try {
+      await this.memory?.chatHistory.clear();
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerError('Error clearing chat history, check logs');
+    }
   }
 }
