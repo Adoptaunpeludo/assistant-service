@@ -7,8 +7,8 @@ export const envs = {
 
   SUPABASE_URL: get('SUPABASE_URL').required().asString(),
   SUPABASE_PRIVATE_KEY: get('SUPABASE_PRIVATE_KEY').required().asString(),
-  DB_PASSWORD: get('DB_PASSWORD').required().asString(),
-  DB_USER: get('DB_USER').required().asString(),
-  DB_NAME: get('DB_NAME').required().asString(),
+  // DB_PASSWORD: get('DB_PASSWORD').required().asString(),
+  // DB_USER: get('DB_USER').required().asString(),
+  // DB_NAME: get('DB_NAME').required().asString(),
   MONGO_DB_URL: get('MONGO_DB_URL').required().asString(),
 };
