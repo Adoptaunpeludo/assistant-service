@@ -88,10 +88,6 @@ export class ChatbotService {
       const tools = [retrieverTool];
 
       this.agentExecutor = await this.createAgentExecutor(tools, prompt);
-
-      this.chat_history = await this.memory.chatHistory.getMessages();
-
-      return ChatHistoryEntity.fromObject(this.chat_history);
     } catch (error) {
       console.log(error);
       throw new InternalServerError('Error creating chat, check logs');
@@ -179,6 +175,17 @@ export class ChatbotService {
     } catch (error) {
       console.log(error);
       throw new InternalServerError('Error getting agent answer, check logs');
+    }
+  }
+
+  public async getChatHistory() {
+    try {
+      this.chat_history = await this.memory!.chatHistory.getMessages();
+
+      return ChatHistoryEntity.fromObject(this.chat_history);
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerError('Error loading chat history, check logs');
     }
   }
 

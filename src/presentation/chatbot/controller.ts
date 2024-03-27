@@ -31,8 +31,8 @@ export class ChatbotController {
   createChat = async (req: Request, res: Response) => {
     const { token } = req.params;
 
-    const history = await this.chatbotService.createChat(token);
-    res.status(200).json({ message: 'Chat created successfully', history });
+    await this.chatbotService.createChat(token);
+    res.status(200).json({ message: 'Chat created successfully' });
   };
 
   userQuestion = async (req: Request, res: Response) => {
@@ -40,6 +40,11 @@ export class ChatbotController {
 
     const response = await this.chatbotService.getChatBotAnswer(question);
     return this.returnStream(res, response);
+  };
+
+  getChatHistory = async (_req: Request, res: Response) => {
+    const history = await this.chatbotService.getChatHistory();
+    res.status(200).json(history);
   };
 
   deleteChatHistory = async (_req: Request, res: Response) => {
