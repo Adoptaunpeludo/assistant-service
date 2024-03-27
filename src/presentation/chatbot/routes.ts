@@ -22,7 +22,7 @@ export class ChatbotRoutes {
     const chatbotController = new ChatbotController(chatbotService);
 
     router.delete('/chat-history/', chatbotController.deleteChatHistory);
-    router.post('/create-chat/:username', chatbotController.createChat);
+    router.post('/create-chat/:token', chatbotController.createChat);
     router.post('/user-question', chatbotController.userQuestion);
 
     return router;

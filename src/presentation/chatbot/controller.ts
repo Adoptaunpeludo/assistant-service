@@ -31,6 +31,8 @@ export class ChatbotController {
   createChat = async (req: Request, res: Response) => {
     const { token } = req.params;
 
+    console.log(req.params);
+
     try {
       const history = await this.chatbotService.createChat(token);
       res.status(200).json({ message: 'Chat created successfully', history });
