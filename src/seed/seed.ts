@@ -19,8 +19,32 @@ async function seed() {
     const text = await fs.readFile(filePath, 'utf-8');
 
     const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 250,
-      chunkOverlap: 30,
+      chunkSize: 500,
+      chunkOverlap: 100,
+      // separators: [
+      //   '<Inicio>',
+      //   '<Usuario Anónimo>',
+      //   '<Menu de Navegación>',
+      //   '<Detalles de los Animales>',
+      //   '<Detalles Ampliados de los Animales>',
+      //   '<Asociaciones>',
+      //   '<Autenticación y Cuentas>',
+      //   '<Creación de Cuentas>',
+      //   '<Verificación de Cuentas>',
+      //   '<Recuperación de Contraseña>',
+      //   '<Inicio de Sesión>',
+      //   '<Usuario Autenticado>',
+      //   '<Perfil de Usuario>',
+      //   '<Detalles del Perfil>',
+      //   '<Añadir a Favoritos>',
+      //   '<Chat con Protectoras o Asociaciones>',
+      //   '<Notificaciones>',
+      //   '<Chats>',
+      //   '<Gestión de Protectoras o Asociaciones>',
+      //   '<Gestión de Anuncios de Adopción>',
+      //   '<Eliminación de Cuenta>',
+      //   '<Notificaciones por Correo Electrónico>',
+      // ],
     });
 
     const output = await splitter.createDocuments([text]);

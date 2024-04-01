@@ -21,6 +21,7 @@ export class ChatbotController {
     res.status(200);
 
     for await (const chunk of readable) {
+      console.log({ chunk });
       res.write(chunk);
       await new Promise((resolve) => setTimeout(resolve, 50));
     }

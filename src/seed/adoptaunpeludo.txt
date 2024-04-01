@@ -1,222 +1,44 @@
-Adopta un peludo
-Bootcamp XV
-Keepcoding web Fullstack bootcamp
-
-
-adoptaunpeludo.es
-28 de enero de 2024
-Descripción General:
-Nuestra idea es crear un punto de encuentro donde protectoras y asociaciones puedan mostrar los animales que han rescatado de la calle para los que buscan una familia y las personas interesadas en adoptar o acoger una mascota puedan conocer sus características y ponerse en contacto con las protectoras. 
-Integrantes:
-Jose Alberto, Paco, Juanma, Pol
-Características Principales:
-Zonas Públicas:
-Acceso abierto para todos los visitantes sin necesidad de registro.
-Contenido público, como información general, noticias y recursos accesibles para cualquier usuario.
-Listado con anuncios de animales: 
- Datos mínimos: nombre, foto,  descripción, en adopción o acogida, protectora que ha creado el anuncio. 
-Listado paginado con un límite máximo de anuncios por pantalla que el usuario podrá avanzar. 
-Este listado tiene dos zonas, uno limitado a x anuncios dentro de una sección de destacados en la home del site. tendremos en la home una sección por especie de animales recogidos en la bd. en principios perros y gatos pero ampliable en un futuro a otras especies. 
-La segunda zona es la página específica de la especie consultada en ella tendremos todos los anuncios creados para la especie consultada mostrados de forma paginada. 
-En esta zona específica con el listado de anuncios contará con un buscador de anuncios y distintos filtros por ejemplo: 
-rango de edad del animal. 
-tamaño
-sexo
-lugar de adopción
-Todos los listados podrán ser ordenados por antigüedad, por defecto se mostrarán de más antiguo a más reciente para dar visibilidad a aquellos animales que llevan más tiempo pendientes de adopción. 
-Consulta de detalle de un anuncio. 
-Desde cualquier listado de anuncios se podrá cargar una vista de detalle con información ampliada del animal. 
-Se podrá compartir en RRSS esta vista detallada para dar visibilidad al anuncio. 
-Anuncios de una protectora. 
-Tanto en el listado general como en la vista de detalle del anuncio desde el identificador de la protectora podemos acceder a consultar un listado de todos los anuncios que tienen creados para ver todos los animales que dicha protectora tiene disponibles en la plataforma, es decir todos aquellos que no hayan sido adoptados aun. 
-Registro / Login de usuario. 
-Para acceder al área privada  tanto usuarios adoptantes como protectoras deberán de crear un usuario.  Se establecerá un sistema de recuperación de contraseñas de usuarios a través de verificación de email. 
-
-Zonas Privadas:
-usuarios y roles
-Dentro de esta zona privada debemos distinguir dos roles de usuario diferenciados, por un lado tenemos a adoptante y por otro lado tenemos a las protectoras, hay acciones comunes para ambos y acciones específicas para cada rol. 
-Acciones comunes
-Actualización de datos, los usuarios pueden acceder al perfil específico del usuario para poder actualizar sus datos personales. 
-Realizar logout / dar de baja al usuario, el usuario autenticado puede desloguear su sesión o borrar su perfil junto a toda la información asociada a él. 
-Acciones específicas del rol protectora 
-Crear anuncios con un animal para adoptar, con una información mínima obligatoria se podrá dar de alta un animal para adopción /  acogida. 
-Ver listado con todos los animales publicados activos. un usuario protectora podrá ver un listado con todos sus anuncios y acceder al detalle de ellos, desde dicho detalle podrá realizar acciones complementarias. 
-Editar anuncios, una protectora podrá editar sus anuncios para añadir más información o modificar aquellos datos que estime oportuno. 
-Borrar un anuncio, una protectora podrá borrar de la plataforma si el animal ha sido adaptado de forma offline por ejemplo o por otros motivos. 
-Marcar / desmarcar animal como preadoptado, como protectora podrá identificar aquellos anuncios de animales que se encuentren en proceso de adopción para que posibles adoptantes sean conscientes de esta situación.  
-Una protectora desde su zona privada puede responder vía chat a los usuarios registrados que se comuniquen con ella desde la página de detalle de un anuncio o desde la página donde se listan todos los anuncios pertenecientes a dicha protectora. 
-Recibir una notificación de mensajes de chat sin leer
-
-Acciones específicas del rol adoptante 
-Marcar un anuncio como favorito.
-Ver listado de anuncios marcados como favoritos.
-Desmarcar un anuncio como favorito.
-Chatear con una protectora bien a través de detalle de un anuncio o dentro de la página específica de la protectora. 
-Recibir un aviso online o por mail cuando un animal marcado como favorito cambie a adoptado. 
-Recibir un aviso online o por mail cuando un animal marcado como favorito cambie a preadoptado. 
-Recibir un aviso online o por mail cuando un animal marcado como favorito cambie de edad ejemplo de cachorro a adulto. 
-Recibir una notificación de mensajes de chat sin leer. 
-Recibir un email de animales con que compartan características con los que he marcado como favoritos.  
-
-Requisitos Técnicos:
-Tecnología:
-Para el Backend usaremos node con Nest/Express y conexión a una Base de datos MongoDB
-Para el frontend usaremos react con styled components, react-router-dom, react query.
-
-Adoptaunpeludo.com es una plataforma que permite la adopcion y acogida de animales o peludos por parte de usuarios.
-
-La plataforma cuenta con dos componentes pricipales:
-Zona Pública: un sitio web donde se podrá acceder a los contenidos públicos (sin necesidad de crear cuenta)
-Zona Privada: los usuarios que se registren como refugio, podrán acceder a su zona privada para poder publicar anuncios de adopción de animales o "peludos".
-
-Roles definidos:
-Usuario Anónimo: usuario de la zona pública cuyo principal interés es la busqueda y visualizacion de anuncios de adopcion:
-Miembro de la plataforma shelter o refugio: usuario de la zona privada cuyo principal interes es la administración de sus anuncios de adopcion.
-Miembro de la plataforma adopter o adoptante: usuario de la zona privada cuyo principal interes es la busqueda de anuncios de adopción y en su caso ponerse en contacto con un refugio a través de un chat para concretar la adopción o acogida del animal o peludo en concreto.
-
-Funcionalidades:
-Zona publica:
-Registro de usuario
-Un usuario anonimo desde la zona publica podrá darse de alta en el sistema para poder asi autenticarme y poder realizar funciones como miembro de la plataforma indiciando mi nombre de usuario, dirección de email y contraseña de acceso.
-Restricciones/Criterios de aceptacion:
-No se podrá utilizar un nombre de usuario o un email que ya existan en el sistema
-
-Recuperación de contraseña
-Un usuario anonimo podrá recuperar su contraseña si la olvida para poder asi volver a hacer login en la zona privada.
-Restricciones/Criterios de aceptacion:
-Para recuperar la contraseña el usuario deberá indicar la direccion de email asociada a su cuenta de susuario
-Cuando el usuario indique el email correcto recibirá un email con un enlace que le permita reestablecer su nueva contraseña
-
-Login de usuario
-Un usuario anonimo podrá hacer login en la plataforma para acceder a la zona privada y así poder acceder a todas las funcionalidades de la misma
-Restricciones/Criterios de aceptacion:
-Solo podran autenticarse usuarios registrados (miembros de la plataforma)
-Para autenticarse deberan indicar su email y su contraseña
-
-Ver listado de los ultimos anuncios
-Tanto los usuarios anonimos como los registrados podran acceder a un listado de los ultimos anuncios publicados por los refugios de la plataforma al acceder a la pagina principial para asi acceder a los ultimos contenidos de manera rapdia
-Restricciones/Criterios de aceptacion:
-Se mostrarán los anuncios publicados por orden cronologico, siendo el primero el mas reciente y el utlimo el mas antiguo
-No se mostraran todos los anuncios publicados en la pagina inicial, se utilizara paginacion
-Cada anuncio mostrará los datos de la mascota como nombre, edad, genero, tamaño, ciudad...
-
-Buscar y encontrar anuncios
-Tanto los usuarios anonimos como los usuarios registrados podran buscar anuncios utilizando un buscador para asi encontrar rapidamente anuncios que traten sobre lo que les interesa en un momento dado
-Restricciones/Criterios de aceptacion
-El usuario podrá buscar por los siguientes criterios nombre, tamaño, genero, edad, provincia
-Se mostrarán los anuncios que encajen en la busqueda por orden cronologico, siendo el primero el mas reciente y el ultimo el mas antiguo
-No se mostraran todos los anuncios, se utilizará paginación
-Cada anuncio mostrará nombre, edad, genero, tamaño, ciudad...
-
-Ver detalle de un anuncio
-Tanto los usuarios anonimos como los usuarios registrados podran acceder al detalle de un anuncio de adopcion desde algun listado de anuncios para poder leer todo su contenido
-Restricciones/Criterios de aceptacion
-Cada anuncio tendrá una url unica que incluirá de alguna forma el nombre de la mascota
-Cada anuncio independientemente del tipo, gato o perro mostrará:
-Fecha de entrada, protectora, ciudad, nombre edad, raza sexo, tamaño
-Cada anuncio de un gato a parte de la informacion comun mostrara:
-facil de entrenar, nivel de energia, cantidad de muda, nivel de juego, sociable con niños, tendencia a arañar, entrenado en el arenero
-Cada a nuncio de un perro a parte de la informacion comun mostrara:
-facil de entrenar, nivel de energia, cantidad de muda, potencial de babeo, acostumbrado a un piso, tendencia a ladrar/aullar
-
-Compartir un anuncio en redes sociales
-Los usuarios podrán compartir un anuncio en redes sociales (facebook, X e instagram) si le resulta interesante
-
-Ver anuncios de un miembro:
-Cualquier tipo de usuario podra acceder a un listado de los ultimos anuncios publicados por un refugio accediendo a la url de su perfil
-Restricciones/Criterios de aceptacion
-Se mostrarán los anuncios publicados por dicho miembro por orden cronologico y con paginacion (no se mostraran todos los anuncios)
-La url incluirá el nombre del refugio
-
-Ver anuncios mas antiguos o mas recientes
-Cualquier tipo de usuario podra acceder a los anuncios mas antiguos o mas recientes desde los diferentes listados de anuncios (principal, resultados de busqueda y anuncios de un miembro) para poder asi navegar por todos los anuncios que hay en el listado que esté utilizando
-Restricciones/Criterios de aceptacion
-Solo se podran visualizar anuncios si los hay
-
-
-Zona Privada:
-Baja de usuario:
-Cada miembro autenticado de la plataforma podra dar de baja su cuenta desde su zona privada para dejar de ser miembro de la misma.
-Restricciones/Criterios de aceptacion
-Al dar de baja una cuenta se eliminaran todos los recursos asociados a la misma, fotos, anuncios, chats, etc
-Antes de la eliminación se deberá aceptar un mensaje de confirmacion de eliminacion
-
-Actualizacion de datos de usuario:
-Los miembros autenticados de la plataforma podra actualizar sus datos desde su zona privada de manera que podran corregir y poner al dia cualquier de sus datos ademas de cambiar su contraseña
-Restricciones/Criterios de aceptacion
-Un usuario solo podrá actualizar sus datos si está autenticado
-No podran cambiar el email
-
-Logout de usuario:
-Los miembros podrán cerrar sesion en la plataforma para evitar que un usuario no autorizado pueda utilizar mi cuenta desde un ordenador sin su autorizacion
-Restricciones/Criterios de aceptacion
-Solo podran cerrar sesion los usuarios autentificados
-
-Ver listado de todos mis anuncios:
-Un usuario de tipo refugio podrá acceder al listado de todos sus anuncios para poder editarlos o eliminarlos
-Restricciones/Criterios de aceptacion
-El miembro solo podra editar o eliminar anuncios creados por él
-Será necesario estar autenticado
-
-Crear un anuncio
-Un miembro de tipo refugio podrá crear anuncios de adopcion a traves de un formulario donde deberá rellenar todos los campos que conforman un anuncio.
-Restricciones/Criterios de aceptacion
-Solo los miembros autentificados de tipo refugio podrán crear anuncios
-Un anuncio estará formado de forma comun por:
-ciudad, nombre edad, raza sexo, tamaño
-Cada anuncio de un gato a parte de la info comun necesitara:
-facil de entrenar, nivel de energia, cantidad de muda, nivel de juego, sociable con niños, tendencia a arañar, entrenado en el arenero
-Cada a nuncio de un perro a parte de la informacion comun necesitara:
-facil de entrenar, nivel de energia, cantidad de muda, potencial de babeo, acostumbrado a un piso, tendencia a ladrar/aullar
-
-Editar un anuncio
-Un miembro de tipo refugio podra acceder a la edicion de un anuncio a traves del listado de sus anuncios para asi poder modificar el anuncio a su gusto
-Restricciones/Criterios de aceptacion
-Tiene las mismas restricciones que Crear un anuncio
-Solo el dueño del anuncio podra modificar su anuncio
-
-Borrar un anuncio
-Un miembro de tipo refugio podrá borrar o eliminar un anuncio
-Restricciones/Criterios de aceptacion
-Solo el dueño del anuncio podra borrar su anuncio
-Antes de la eliminación se deberá aceptar un mensaje de confirmacion de eliminacion
-
-Chatear con otro miembro:
-Un miembro de tipo adoptante podra iniciar un chat con otro miembro de tipo refugio a atraves de un anuncio de adopcion de mascota o peludo
-Restricciones/Criterios de aceptacion
-Las conversaciones se clasificarán por anuncio, no por los miembros que participan, (dos miembros pueden tener conversaciones diferentes, una por cada anuncio)
-
-Ver anuncios favoritos:
-Un miembro de tipo adoptante podra acceder a sus anuncios guardados como favoritos sin tener que volver a buscarlos
-Restricciones/Criterios de aceptacion
-El miembro solo podrá acceder los anuncios favoritos que él ha guardado como favoritos
-
-Añadir un anuncio a favoritos
-Un miembro de tipo adoptante podrá guardar un anuncio como favorito para despues poder consultarlo
-Restricciones/Criterios de aceptacion
-Solo usuarios de tipo adoptante podran guardar anuncios como favoritos
-
-Eliminar un anuncio de favoritos
-Un miembro de tipo adoptante podra eliminar anuncios que ha guardado previamente como favoritos para quitar los que ya no son sus favoritos
-Restricciones/Criterios de aceptacion
-El miembro solo podrá eliminar los anuncios favoritos que él ha guardado como favoritos
-
-Recibir una notificacion cuando un anuncio cambie
-Un miembro de tipo adoptante recibira una notificacion cada vez que un anuncio de sus favoritos cambie (sean actualizados cualquiera de sus campos)
-Restricciones/Criterios de aceptacion
-Si el miembro está conectado recibira una notificacion en tiempo real
-Si el miembro está desconectado recibira un email
-En cualquiera de los casos anteriores se recibira un link al detalle del anuncio que ha cambiado y los cambios que se produjeron
-
-Recibir una notificacion de nuevos mensajes de chat sin leer
-Cualquier tipo de usuario autentificado (refugio o adoptante) recibira una notificacion de nuevos mensajes de chat sin leer
-Restricciones/Criterios de aceptacion
-Si el miembro está conectado recibira una notificacion en tiempo real
-Si el miembro está desconectado recibira un email
-En cualquiera de los casos anteriores se recibira un link al chat
-
-Recibir un email de anuncios de interes
-Como usuario adoptante recibira un email de anuncios de adopcion que encajen con alugo de los anuncios que haya guardado en favoritos para asi encontrar mas facilmente mascotas/animales/peludos que adoptar
-Restricciones/Criterios de aceptacion
-El email incluira un enlace al detalle del anuncio
-Los criterios seran ciudad, edad, raza, sexo
+<Inicio>
+La plataforma adoptaunpeludo.com ha sido diseñada como un espacio de encuentro para facilitar la adopción de mascotas rescatadas por protectoras y asociaciones, conectando a aquellos que buscan una nueva familia con los animales necesitados de hogar. Los responsables de esta iniciativa son Jose Alberto, Paco, Juanma y Pol, pertenecientes al Bootcamp de Desarrollo Web Full Stack XV de Keepcoding.
+<Usuario Anónimo>
+Como usuario anónimo, podrás navegar por diversas secciones públicas de la web, como la página principal o "Home", donde se te presentarán datos generales junto con los últimos cuatro perros y cuatro gatos disponibles para adopción. Además, tendrás acceso a estadísticas como el número total de animales en adopción, los que están esperando un hogar y los que ya han sido adoptados, entre otros.
+<Menu de Navegación>
+En el menú de navegación, al hacer clic en "Perros" o "Gatos", podrás acceder a las páginas que muestran los últimos animales en adopción. Se mostrarán 10 animales por página, y podrás desplazarte entre ellas haciendo clic en los números correspondientes. También tendrás la opción de filtrar por "Nombre", "Tamaño", "Género", "Edad" y "Provincia". Una vez seleccionados los filtros, deberás hacer clic en el botón "Buscar" para ver los resultados, y para limpiar los criterios de búsqueda, simplemente haz clic en "Reset".
+<Detalles de los Animales>
+Cada ficha de animal en estas páginas ofrecerá una breve descripción, incluyendo una foto principal, el logo del refugio, el nombre, un resumen de la descripción, tamaño, género, edad y localización. Además, encontrarás un botón en forma de corazón para añadir el animal a tus favoritos, junto con el número de favoritos. Es importante tener en cuenta que un usuario anónimo no podrá agregar animales a favoritos; si intenta hacerlo, recibirá un mensaje indicando que primero debe iniciar sesión.
+<Detalles Ampliados de los Animales>
+Para ver más detalles de un animal, simplemente haz clic en el botón "Ver" en la esquina inferior derecha de la tarjeta del animal. Dentro de la página de detalles del animal, podrás visualizar varias imágenes, así como información más detallada, como la fecha de entrada, raza y otras características específicas. También tendrás la opción de añadir o quitar de favoritos, iniciar un chat con la protectora que creó el anuncio, y compartir en redes sociales. Nuevamente, ten en cuenta que estas funciones están disponibles solo para usuarios autenticados en el sistema.
+<Asociaciones>
+Si haces clic en el botón "Asociaciones" en el menú de navegación, se te dirigirá a una página que lista las asociaciones y refugios registrados. Allí encontrarás una imagen representativa, el estado en línea (solo para usuarios autenticados), un resumen de la descripción y la localización. Al hacer clic en "Ver" en cualquiera de las asociaciones o refugios, serás redirigido a una página con más detalles, incluyendo imágenes adicionales, información de contacto, ubicación y estadísticas sobre las mascotas anunciadas, acogidas o adoptadas. También tendrás la opción de iniciar un chat con la asociación o protectora, una función que solo está disponible para usuarios autenticados, al igual que ver todos los anuncios de adopción creados por esta protectora/asociación haciendo click en el botón “Ver peludos en adopción” en la parte inferior de la página.
+<Autenticación y Cuentas>
+Las funcionalidades relacionadas con la autenticación y creación de cuentas son las siguientes:
+<Creación de Cuentas>
+Para crear una cuenta, el usuario debe hacer clic en "Login" y luego en "¿Necesitas crear una cuenta? Regístrate". Deberá proporcionar el tipo de cuenta (Protectora o Adoptante), un nombre de usuario único, un correo electrónico también único, una contraseña y confirmarla.
+<Verificación de Cuentas>
+Una vez creada la cuenta, el usuario recibirá un correo electrónico de verificación en la dirección proporcionada. Deberá hacer clic en el enlace de verificación dentro de los próximos 15 minutos para validar la cuenta. Después de la verificación, podrá iniciar sesión utilizando el correo electrónico y la contraseña proporcionados durante la creación de la cuenta.
+<Recuperación de Contraseña>
+En caso de olvidar la contraseña, el usuario puede hacer clic en "¿Olvidaste tu contraseña?" en la página de inicio de sesión. Luego, deberá ingresar un correo electrónico registrado y validado, donde recibirá un enlace para restablecer su contraseña.
+<Inicio de Sesión>
+Para iniciar sesión en la web, el usuario simplemente debe hacer clic en "Login" en la esquina superior derecha de la página.
+<Usuario Autenticado>
+Como usuario autenticado, tendrás acceso a todas las funcionalidades de un usuario anónimo, y además:
+<Perfil de Usuario>
+Tu imagen de avatar y nombre se mostrarán en la esquina superior derecha de la web. Al hacer clic en tu nombre, se desplegará un menú donde podrás acceder a tu perfil, tus notificaciones, tus chats o hacer logout de tu cuenta.
+<Detalles del Perfil>
+Dentro de tu perfil, como usuario adoptante, podrás modificar todos tus datos personales y tu imagen de avatar. Además, se mostrará una lista de tus animales agregados a favoritos, donde podrás ver el detalle del animal o eliminarlo de favoritos. Al agregar un animal a favoritos, recibirás automáticamente notificaciones sobre cualquier modificación en sus datos, como cambios de nombre o descripción. El número de notificaciones se mostrará sobre tu imagen de avatar en la esquina superior derecha de la barra de navegación.
+<Añadir a Favoritos>
+Como usuario adoptante, podrás agregar y quitar animales de favoritos haciendo clic en el corazón de la esquina inferior izquierda de cualquier tarjeta de animal en la lista de animales, ya sea de perros o gatos.
+<Chat con Protectoras o Asociaciones>
+Además, podrás iniciar un chat con una protectora o asociación accediendo al detalle de la misma y haciendo clic en “Habla con la protectora” justo debajo de su imagen principal. Al realizar esta acción, se abrirá una nueva página donde podrás comunicarte con la protectora o asociación. Si deseas chatear acerca de un animal en particular, podrás hacerlo desde el detalle del animal haciendo clic en “Habla con la protectora” en la parte inferior de la página, abriendo así una nueva página para hablar sobre el proceso de adopción del animal.
+<Notificaciones>
+En la sección de “Notificaciones” del menú desplegable, encontrarás todas tus notificaciones, tanto leídas como no leídas. Al hacer clic en una notificación, se marcará como leída y se te redireccionará a la página correspondiente. Por ejemplo, si la notificación es sobre un cambio en uno de tus animales favoritos, se abrirá el detalle del animal en cuestión. Si la notificación es sobre un chat con mensajes sin leer, se abrirá la página del chat.
+<Chats>
+En la sección de “Chats” del menú desplegable, se mostrará el último chat creado (si lo hubiera) y una lista de todos los chats con protectoras o asociaciones.
+<Gestión de Protectoras o Asociaciones>
+Dentro de tu perfil como protectora o asociación, tendrás la capacidad de añadir hasta seis imágenes representativas de tu entidad, así como modificar los datos relacionados tanto con la protectora o asociación como con el usuario, y también podrás gestionar las redes sociales asociadas. Todas estas acciones se realizan haciendo clic en el botón “Editar” ubicado debajo de la sección correspondiente.
+<Gestión de Anuncios de Adopción>
+Además, como protectora o asociación, dispondrás de una lista completa de todos los anuncios de adopción que hayas creado. Desde esta lista o tabla, tendrás la opción de ver los detalles de cada anuncio, modificarlos o borrarlos directamente.
+<Eliminación de Cuenta>
+Cualquier tipo de usuario, ya sea adoptante, protectora o asociación, puede eliminar su cuenta haciendo clic en el botón “Borrar Usuario” en la parte inferior de la página del perfil.
+<Notificaciones por Correo Electrónico>
+Es importante destacar que como usuario registrado en el sistema, recibirás notificaciones por correo electrónico en caso de que se produzcan eventos relevantes mientras no estés autenticado o en línea en la web.
