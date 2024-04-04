@@ -35,7 +35,9 @@ export class Server {
     this.app.use(this.routes);
 
     //* Error Handler Middleware
-    this.app.use(ErrorHandlerMiddleware.handle);
+    const errorHandlerMiddleware = new ErrorHandlerMiddleware();
+
+    this.app.use(errorHandlerMiddleware.handle);
 
     this.serverListener = this.app.listen(this.port, async () => {
       try {

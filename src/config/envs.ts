@@ -13,4 +13,6 @@ export const envs = {
   MONGO_DB_URL: get('MONGO_DB_URL').required().asString(),
 
   JWT_SEED: get('JWT_SEED').required().asString(),
+
+  RABBITMQ_URL: get('RABBITMQ_URL').required().asString(),
 };
