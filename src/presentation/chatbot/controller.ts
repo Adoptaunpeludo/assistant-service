@@ -5,6 +5,11 @@ import { Readable } from 'stream';
 export class ChatbotController {
   constructor(private readonly chatbotService: ChatbotService) {}
 
+  /**
+   * Returns a stream of chunks to the response.
+   * @param res The response object.
+   * @param response The response string to be chunked.
+   */
   private async returnStream(res: Response, response: string) {
     function* chunkText(text: string, chunkSize: number) {
       for (let i = 0; i < text.length; i += chunkSize) {
@@ -28,6 +33,11 @@ export class ChatbotController {
     res.end();
   }
 
+  /**
+   * Endpoint to create a new chat session.
+   * @param req The request object.
+   * @param res The response object.
+   */
   createChat = async (req: Request, res: Response) => {
     const { token } = req.params;
 
@@ -35,6 +45,11 @@ export class ChatbotController {
     res.status(200).json({ message: 'Chat created successfully' });
   };
 
+  /**
+   * Endpoint to handle user questions and return chatbot responses as a stream.
+   * @param req The request object.
+   * @param res The response object.
+   */
   userQuestion = async (req: Request, res: Response) => {
     const { question } = req.body;
 
@@ -42,11 +57,21 @@ export class ChatbotController {
     return this.returnStream(res, response);
   };
 
+  /**
+   * Endpoint to retrieve chat history.
+   * @param _req The request object.
+   * @param res The response object.
+   */
   getChatHistory = async (_req: Request, res: Response) => {
     const history = await this.chatbotService.getChatHistory();
     res.status(200).json(history);
   };
 
+  /**
+   * Endpoint to delete chat history.
+   * @param _req The request object.
+   * @param res The response object.
+   */
   deleteChatHistory = async (_req: Request, res: Response) => {
     await this.chatbotService.deleteChatHistory();
     res.status(200).json({ message: 'Chat history deleted successfully' });
