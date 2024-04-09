@@ -37,6 +37,13 @@ export class ChatbotService {
   private memory?: BufferMemory;
   private chat_history: BaseMessage[] = [];
 
+  /**
+   * Creates an instance of ChatbotService.
+   * @param openAIOptions Options for the OpenAI chat model.
+   * @param supabaseOptions Options for connecting to Supabase.
+   * @param memoryService Service for managing chat memory.
+   * @param jwt Adapter for JWT token operations.
+   */
   constructor(
     private readonly openAIOptions: OpenAIOptions,
     private readonly supabaseOptions: SupabaseOptions,
@@ -69,6 +76,10 @@ export class ChatbotService {
     }
   }
 
+  /**
+   * Creates a new chat session.
+   * @param token JWT token for authentication.
+   */
   async createChat(token: string) {
     try {
       const payload = this.jwt.validateToken(token);
@@ -94,6 +105,11 @@ export class ChatbotService {
     }
   }
 
+  /**
+   * Creates a prompt template for the chatbot based on the provided document.
+   * @param document The document context for the chatbot.
+   * @returns The generated chat prompt template.
+   */
   private createPrompt(document: string) {
     const prompt = ChatPromptTemplate.fromMessages([
       [
@@ -113,6 +129,11 @@ export class ChatbotService {
     return prompt;
   }
 
+  /**
+   * Creates a retriever tool for the chatbot.
+   * @returns The retriever tool instance.
+   * @throws Throws an error if there's an issue creating the retriever tool.
+   */
   private async createRetrieverTool() {
     try {
       const vectorStore = await SupabaseVectorStore.fromExistingIndex(
@@ -140,6 +161,13 @@ export class ChatbotService {
     }
   }
 
+  /**
+   * Creates an agent executor for the chatbot.
+   * @param tools Additional tools to be used by the agent.
+   * @param prompt The prompt template for the agent.
+   * @returns The agent executor instance.
+   * @throws Throws an error if there's an issue creating the agent executor.
+   */
   private async createAgentExecutor(tools: any, prompt: ChatPromptTemplate) {
     try {
       const agent = await createOpenAIFunctionsAgent({
@@ -163,6 +191,12 @@ export class ChatbotService {
     }
   }
 
+  /**
+   * Gets the chatbot's response to a given question.
+   * @param question The question asked by the user.
+   * @returns The chatbot's response.
+   */
+
   public async getChatBotAnswer(question: string) {
     try {
       const response = await this.agentExecutor!.invoke({
@@ -178,6 +212,10 @@ export class ChatbotService {
     }
   }
 
+  /**
+   * Retrieves the chat history.
+   * @returns The chat history.
+   */
   public async getChatHistory() {
     try {
       this.chat_history = await this.memory!.chatHistory.getMessages();
@@ -189,6 +227,9 @@ export class ChatbotService {
     }
   }
 
+  /**
+   * Deletes the chat history.
+   */
   public async deleteChatHistory() {
     try {
       await this.memory?.chatHistory.clear();
