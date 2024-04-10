@@ -52,22 +52,22 @@ export class ChatbotService {
     private readonly memoryService: MemoryService
   ) {}
 
-  private async getChatState(userId: string): Promise<ChatState | undefined> {
-    return this.chatStates.get(userId);
+  private async getChatState(username: string): Promise<ChatState | undefined> {
+    return this.chatStates.get(username);
   }
 
   private async updateChatState(
-    userId: string,
+    username: string,
     chatState: ChatState
   ): Promise<void> {
-    this.chatStates.set(userId, chatState);
+    this.chatStates.set(username, chatState);
   }
 
   /**
    * Creates a new chat session.
    * @param token JWT token for authentication.
    */
-  async createChat(userId: string) {
+  async createChat(username: string) {
     const { maxTokens, openAIApiKey, temperature } = this.openAIOptions;
 
     const model = new ChatOpenAI({
@@ -98,7 +98,7 @@ export class ChatbotService {
         'Error creating retriever tool, check server logs'
       );
 
-    const memory = await this.memoryService.createMemory(userId);
+    const memory = await this.memoryService.createMemory(username);
 
     if (!memory)
       throw new InternalServerError('Error creating memory, check server logs');
@@ -117,7 +117,7 @@ export class ChatbotService {
         'Error creating agent executor, check server logs'
       );
 
-    this.updateChatState(userId, {
+    this.updateChatState(username, {
       agentExecutor,
       memory,
       model,
@@ -211,12 +211,12 @@ export class ChatbotService {
    * @returns The chatbot's response.
    */
 
-  public async getChatBotAnswer(question: string, userId: string) {
-    let chatState = await this.getChatState(userId);
+  public async getChatBotAnswer(question: string, username: string) {
+    let chatState = await this.getChatState(username);
 
     if (!chatState) {
-      await this.createChat(userId);
-      chatState = await this.getChatState(userId);
+      await this.createChat(username);
+      chatState = await this.getChatState(username);
     }
 
     const { agentExecutor, memory } = chatState!;
@@ -236,8 +236,8 @@ export class ChatbotService {
    * Retrieves the chat history.
    * @returns The chat history.
    */
-  public async getChatHistory(userId: string) {
-    const memory = await this.memoryService.createMemory(userId);
+  public async getChatHistory(username: string) {
+    const memory = await this.memoryService.createMemory(username);
     const chat_history = await memory.chatHistory.getMessages();
 
     return ChatHistoryEntity.fromObject(chat_history);
@@ -246,8 +246,8 @@ export class ChatbotService {
   /**
    * Deletes the chat history.
    */
-  public async deleteChatHistory(userId: string) {
-    const memory = await this.memoryService.createMemory(userId);
+  public async deleteChatHistory(username: string) {
+    const memory = await this.memoryService.createMemory(username);
     await memory.chatHistory.clear();
   }
 }

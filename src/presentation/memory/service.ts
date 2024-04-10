@@ -22,7 +22,7 @@ export class MemoryService {
     return await this.connectToCollection();
   }
 
-  async createMemory(userId: string) {
+  async createMemory(username: string) {
     const collection = await this.getCollection();
 
     try {
@@ -33,7 +33,7 @@ export class MemoryService {
         outputKey: 'output',
         chatHistory: new MongoDBChatMessageHistory({
           collection,
-          sessionId: userId,
+          sessionId: username,
         }),
       });
 
@@ -44,17 +44,17 @@ export class MemoryService {
     }
   }
 
-  async removeHistory(userId: string) {
+  async removeHistory(username: string) {
     try {
-      const memory = await this.createMemory(userId);
+      const memory = await this.createMemory(username);
 
       if (!memory)
-        throw new NotFoundError(`History for ${userId} does not exist`);
+        throw new NotFoundError(`History for ${username} does not exist`);
 
       await memory.chatHistory.clear();
     } catch (error) {
       console.log(error);
-      throw new InternalServerError(`Error deleting history for ${userId}`);
+      throw new InternalServerError(`Error deleting history for ${username}`);
     }
   }
 }

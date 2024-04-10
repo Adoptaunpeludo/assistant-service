@@ -39,9 +39,9 @@ export class ChatbotController {
    * @param res The response object.
    */
   createChat = async (req: Request, res: Response) => {
-    const id = req.user.id;
+    const username = req.user.name;
 
-    await this.chatbotService.createChat(id!);
+    await this.chatbotService.createChat(username!);
     res.status(200).json({ message: 'Chat created successfully' });
   };
 
@@ -55,7 +55,7 @@ export class ChatbotController {
 
     const response = await this.chatbotService.getChatBotAnswer(
       question,
-      req.user.id!
+      req.user.name!
     );
     return this.returnStream(res, response);
   };
@@ -66,9 +66,9 @@ export class ChatbotController {
    * @param res The response object.
    */
   getChatHistory = async (req: Request, res: Response) => {
-    const id = req.user.id;
+    const username = req.user.name;
 
-    const history = await this.chatbotService.getChatHistory(id!);
+    const history = await this.chatbotService.getChatHistory(username!);
     res.status(200).json(history);
   };
 
@@ -78,9 +78,9 @@ export class ChatbotController {
    * @param res The response object.
    */
   deleteChatHistory = async (req: Request, res: Response) => {
-    const id = req.user.id;
+    const username = req.user.name;
 
-    await this.chatbotService.deleteChatHistory(id!);
+    await this.chatbotService.deleteChatHistory(username!);
     res.status(200).json({ message: 'Chat history deleted successfully' });
   };
 }
