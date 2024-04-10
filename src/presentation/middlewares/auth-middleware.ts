@@ -23,45 +23,19 @@ export class AuthMiddleware {
     res: Response,
     next: NextFunction
   ) => {
-    const { refreshToken, accessToken } = req.signedCookies;
+    const bearer = req.headers.authorization;
 
-    // Check if refresh token and access token are present
-    if (!refreshToken && !accessToken)
+    if (!bearer || !bearer.startsWith('Bearer '))
       throw new UnauthenticatedError('Please first login');
 
-    if (accessToken) {
-      // Validate access token
-      const payload = this.jwt.validateToken(accessToken);
-      if (!payload) throw new UnauthorizedError('Invalid token validation');
-      req.user = payload.user;
-      const wsToken = this.jwt.generateToken({ user: payload.user }, '1d');
-      req.user.wsToken = wsToken;
-      return next();
-    }
+    const token = bearer.split(' ').at(-1);
 
-    // Validate refresh token
-    const payload = this.jwt.validateToken(refreshToken);
+    if (!token) throw new UnauthenticatedError('Token not present');
+
+    const payload = this.jwt.validateToken(token);
     if (!payload) throw new UnauthorizedError('Invalid token validation');
-
-    const { user } = payload;
-
-    // Generate new tokens
-    const accessTokenJWT = this.jwt.generateToken({ user }, '15m');
-    const refreshTokenJWT = this.jwt.generateToken(
-      { user, refreshToken },
-      '1d'
-    );
-
-    // Attach new tokens to response cookies
-    AttachCookiesToResponse.attach({
-      res,
-      accessToken: accessTokenJWT!,
-      refreshToken: refreshTokenJWT!,
-    });
-
-    req.user = user;
-    req.user.wsToken = accessTokenJWT;
-    next();
+    req.user = payload.user;
+    return next();
   };
 
   /**

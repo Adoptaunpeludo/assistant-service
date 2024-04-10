@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 
 import { CustomAPIError } from '../../domain/errors';
 import { HttpCodes } from '../../config/http-status-codes.adapter';
-import { MulterError } from 'multer';
 import { QueueService } from '../services/queue.service';
 import { envs } from '../../config/envs';
 
@@ -14,10 +13,13 @@ export class ErrorHandlerMiddleware {
     envs.RABBITMQ_URL,
     'error-notification'
   );
+
   /**
    * Handles errors and sends appropriate responses.
    */
-  handle(err: Error, _req: Request, res: Response, _next: NextFunction) {
+  constructor() {}
+
+  handle = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.log({ err });
 
     let message, statusCode;
@@ -40,17 +42,11 @@ export class ErrorHandlerMiddleware {
       message = err.message;
     }
 
-    // Handle MulterError
-    if (err instanceof MulterError) {
-      statusCode = HttpCodes.BAD_REQUEST;
-      message = err.message;
-    }
-
     this.errorLogsService.addMessageToQueue(
       {
         message: message,
         level: statusCode === 500 ? 'high' : 'medium',
-        origin: 'assistant-service',
+        origin: 'backend',
       },
       'error-logs'
     );
@@ -59,5 +55,5 @@ export class ErrorHandlerMiddleware {
       name: err?.name || 'Error',
       message: message || err?.message,
     });
-  }
+  };
 }

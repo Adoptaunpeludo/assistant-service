@@ -24,9 +24,9 @@ export class ChatbotRoutes {
 
     router.use(authMiddleware.authenticateUser);
 
+    router.post('/create-chat/', chatbotController.createChat);
     router.delete('/chat-history/', chatbotController.deleteChatHistory);
     router.get('/chat-history', chatbotController.getChatHistory);
-    router.post('/create-chat/:token', chatbotController.createChat);
     router.post('/user-question', chatbotController.userQuestion);
 
     return router;

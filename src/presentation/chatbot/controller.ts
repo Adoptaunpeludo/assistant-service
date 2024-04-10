@@ -53,7 +53,10 @@ export class ChatbotController {
   userQuestion = async (req: Request, res: Response) => {
     const { question } = req.body;
 
-    const response = await this.chatbotService.getChatBotAnswer(question);
+    const response = await this.chatbotService.getChatBotAnswer(
+      question,
+      req.user.id!
+    );
     return this.returnStream(res, response);
   };
 
