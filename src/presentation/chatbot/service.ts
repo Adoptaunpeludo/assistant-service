@@ -34,7 +34,6 @@ export class ChatbotService {
   private readonly embeddings = new OpenAIEmbeddings();
   private readonly client: SupabaseClient;
   private agentExecutor?: AgentExecutor;
-  private memory?: BufferMemory;
   private chat_history: BaseMessage[] = [];
 
   /**
@@ -47,8 +46,7 @@ export class ChatbotService {
   constructor(
     private readonly openAIOptions: OpenAIOptions,
     private readonly supabaseOptions: SupabaseOptions,
-    private readonly memoryService: MemoryService,
-    private readonly jwt: JWTAdapter
+    private readonly memoryService: MemoryService
   ) {
     const { maxTokens, openAIApiKey, temperature } = this.openAIOptions;
     try {
@@ -80,25 +78,21 @@ export class ChatbotService {
    * Creates a new chat session.
    * @param token JWT token for authentication.
    */
-  async createChat(token: string) {
+  async createChat(userId: string) {
     try {
-      const payload = this.jwt.validateToken(token);
-
-      if (!payload) throw new UnauthenticatedError('Invalid JWT token');
-
-      const {
-        user: { name: username },
-      } = payload;
-
       const prompt = this.createPrompt('adoptaunpeludo.com');
 
       const retrieverTool = await this.createRetrieverTool();
 
-      this.memory = await this.memoryService.createMemory(username!);
+      const memory = await this.memoryService.createMemory(userId);
 
       const tools = [retrieverTool];
 
-      this.agentExecutor = await this.createAgentExecutor(tools, prompt);
+      this.agentExecutor = await this.createAgentExecutor(
+        tools,
+        prompt,
+        memory
+      );
     } catch (error) {
       console.log(error);
       throw new InternalServerError('Error creating chat, check logs');
@@ -168,7 +162,11 @@ export class ChatbotService {
    * @returns The agent executor instance.
    * @throws Throws an error if there's an issue creating the agent executor.
    */
-  private async createAgentExecutor(tools: any, prompt: ChatPromptTemplate) {
+  private async createAgentExecutor(
+    tools: any,
+    prompt: ChatPromptTemplate,
+    memory: BufferMemory
+  ) {
     try {
       const agent = await createOpenAIFunctionsAgent({
         llm: this.model,
@@ -179,7 +177,7 @@ export class ChatbotService {
       const agentExecutor = new AgentExecutor({
         agent,
         tools,
-        memory: this.memory,
+        memory,
       });
 
       return agentExecutor;
@@ -216,9 +214,10 @@ export class ChatbotService {
    * Retrieves the chat history.
    * @returns The chat history.
    */
-  public async getChatHistory() {
+  public async getChatHistory(userId: string) {
     try {
-      this.chat_history = await this.memory!.chatHistory.getMessages();
+      const memory = await this.memoryService.createMemory(userId);
+      this.chat_history = await memory.chatHistory.getMessages();
 
       return ChatHistoryEntity.fromObject(this.chat_history);
     } catch (error) {
@@ -230,9 +229,10 @@ export class ChatbotService {
   /**
    * Deletes the chat history.
    */
-  public async deleteChatHistory() {
+  public async deleteChatHistory(userId: string) {
     try {
-      await this.memory?.chatHistory.clear();
+      const memory = await this.memoryService.createMemory(userId);
+      await memory.chatHistory.clear();
     } catch (error) {
       console.log(error);
       throw new InternalServerError('Error clearing chat history, check logs');

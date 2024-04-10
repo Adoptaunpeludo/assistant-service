@@ -22,7 +22,7 @@ export class MemoryService {
     return await this.connectToCollection();
   }
 
-  async createMemory(username: string) {
+  async createMemory(userId: string) {
     const collection = await this.getCollection();
 
     try {
@@ -33,7 +33,7 @@ export class MemoryService {
         outputKey: 'output',
         chatHistory: new MongoDBChatMessageHistory({
           collection,
-          sessionId: username,
+          sessionId: userId,
         }),
       });
 
