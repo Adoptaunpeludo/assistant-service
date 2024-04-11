@@ -2,7 +2,6 @@ import 'express-async-errors';
 import express, { Router } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
 import { ErrorHandlerMiddleware } from './middlewares/error-handler.middleware';
 
 interface Options {
@@ -29,7 +28,6 @@ export class Server {
   async start() {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-    this.app.use(cookieParser(this.jwtSeed));
     this.app.use(morgan('tiny'));
     this.app.use(
       cors({
