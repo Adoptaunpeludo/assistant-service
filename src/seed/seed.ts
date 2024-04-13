@@ -15,36 +15,12 @@ async function seed() {
     const client = createClient(envs.SUPABASE_URL, envs.SUPABASE_PRIVATE_KEY);
 
     //* Read File and Split
-    const filePath = path.resolve(__dirname, 'adoptaunpeludo.txt');
+    const filePath = path.resolve(__dirname, envs.DOCUMENT_NAME);
     const text = await fs.readFile(filePath, 'utf-8');
 
     const splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 500,
       chunkOverlap: 100,
-      // separators: [
-      //   '<Inicio>',
-      //   '<Usuario Anónimo>',
-      //   '<Menu de Navegación>',
-      //   '<Detalles de los Animales>',
-      //   '<Detalles Ampliados de los Animales>',
-      //   '<Asociaciones>',
-      //   '<Autenticación y Cuentas>',
-      //   '<Creación de Cuentas>',
-      //   '<Verificación de Cuentas>',
-      //   '<Recuperación de Contraseña>',
-      //   '<Inicio de Sesión>',
-      //   '<Usuario Autenticado>',
-      //   '<Perfil de Usuario>',
-      //   '<Detalles del Perfil>',
-      //   '<Añadir a Favoritos>',
-      //   '<Chat con Protectoras o Asociaciones>',
-      //   '<Notificaciones>',
-      //   '<Chats>',
-      //   '<Gestión de Protectoras o Asociaciones>',
-      //   '<Gestión de Anuncios de Adopción>',
-      //   '<Eliminación de Cuenta>',
-      //   '<Notificaciones por Correo Electrónico>',
-      // ],
     });
 
     const output = await splitter.createDocuments([text]);

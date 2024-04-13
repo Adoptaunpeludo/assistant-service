@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { ChatbotService } from './service';
 import { ChatbotController } from './controller';
 import { envs } from '../../config/envs';
-import { MemoryService } from '../memory/service';
+import { MemoryService } from '../services/memory.service';
 import { JWTAdapter } from '../../config/jwt.adapter';
 import { AuthMiddleware } from '../middlewares/auth-middleware';
 

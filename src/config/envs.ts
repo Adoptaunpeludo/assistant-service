@@ -16,4 +16,6 @@ export const envs = {
   JWT_SEED: get('JWT_SEED').required().asString(),
 
   RABBITMQ_URL: get('RABBITMQ_URL').required().asString(),
+
+  DOCUMENT_NAME: get('DOCUMENT_NAME').required().asString(),
 };

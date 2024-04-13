@@ -8,7 +8,7 @@ import {
 } from '@langchain/core/prompts';
 import { BufferMemory } from 'langchain/memory';
 import { createOpenAIFunctionsAgent, AgentExecutor } from 'langchain/agents';
-import { MemoryService } from '../memory/service';
+import { MemoryService } from '../services/memory.service';
 import { ChatHistoryEntity } from '../../domain/entities/chat-history.entity';
 import { BadRequestError, InternalServerError } from '../../domain/errors';
 import { DynamicStructuredTool } from '@langchain/core/tools';
