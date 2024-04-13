@@ -44,8 +44,8 @@ Para configurar y ejecutar este servicio, sigue estos pasos:
 
 1. Clona el repositorio y navega al directorio:
     ```bash
-    git clone https://github.com/Adoptaunpeludo/chatbot-service
-    cd chatbot-service
+    git clone https://github.com/Adoptaunpeludo/assistant-service
+    cd assistant-service
     ```
 
 2. Instala las dependencias:
