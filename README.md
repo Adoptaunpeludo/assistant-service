@@ -36,25 +36,24 @@ Este servicio utiliza las siguientes dependencias principales:
 - **Supabase**: Para el almacenamiento de vectores y la gestión de datos.
 - **RabbitMQ**: Para la comunicación asincrónica y la gestión de colas.
 - **MongoDB**: Para el almacenamiento de datos relacionados con el historial de chat.
+- **LangChain**: Framework para desarrollar aplicaciones impulsadas por modelos de lenguaje natural de gran tamaño (LLMs).
 
 ## Instalación
 
 Para configurar y ejecutar este servicio, sigue estos pasos:
 
 1. Clona el repositorio y navega al directorio:
-2. 
     ```bash
-    git clone <url_del_repositorio>
-    cd <directorio_del_repositorio>
+    git clone https://github.com/Adoptaunpeludo/chatbot-service
+    cd chatbot-service
     ```
 
-3. Instala las dependencias:
-4. 
+2. Instala las dependencias:
     ```bash
     npm install
     ```
 
-5. Configura las variables de entorno. Copia el archivo `.env.template` y renómbralo a `.env`, luego configura las variables según sea necesario:
+3. Configura las variables de entorno. Copia el archivo `.env.template` y renómbralo a `.env`, luego configura las variables según sea necesario:
 
     ```plaintext
     PORT=<puerto_del_servicio>
@@ -71,16 +70,26 @@ Para configurar y ejecutar este servicio, sigue estos pasos:
 
     # RabbitMQ
     RABBITMQ_URL=<URL_de_RabbitMQ>
+
+    PORT=<service port>
+
+    DOCUMENT_NAME=<document name to feed the IA>
+    ```
+    
+4. Ejecuta el seed
+   
+    ```bash
+    npm run seed
     ```
 
-6. Arranca la aplicación en modo desarrollo:
-7. 
+5. Arranca la aplicación en modo desarrollo:
+   
     ```bash
     npm run dev
     ```
 
-8. Para ejecutar el servicio en modo producción, primero construye el proyecto y luego arráncalo:
-9. 
+6. Para ejecutar el servicio en modo producción, primero construye el proyecto y luego arráncalo:
+   
     ```bash
     npm run build
     npm run start:prod
