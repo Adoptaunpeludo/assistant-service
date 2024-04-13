@@ -71,9 +71,9 @@ Para configurar y ejecutar este servicio, sigue estos pasos:
     # RabbitMQ
     RABBITMQ_URL=<URL_de_RabbitMQ>
 
-    PORT=<service port>
+    PORT=<puerto del servicio>
 
-    DOCUMENT_NAME=<document name to feed the IA>
+    DOCUMENT_NAME=<nombre del documento a almacenar en supabase para las consultas>
     ```
     
 4. Ejecuta el seed
